@@ -159,7 +159,7 @@ class IO:
             """
         print("\nThe current registrations are (in comma-separated format): ")
         print("-" *50)
-        for student in students:
+        for student in students:  ###?? - should this be for student in student_data???
             print(f"{student['FirstName']},{student['LastName']},{student['CourseName']}")
             #string_row = f"["FirstName"],student[0],student[1],student[2]))
             #print(student["FirstName"],student["LastName"],student["CourseName"])
@@ -193,8 +193,8 @@ class IO:
             print()
             print(f"You have registered {student_first_name} {student_last_name} for {course_name}.")
         except ValueError as e:
-            IO.output_error_messages("-- Technical Error Message -- ", e)
-        except Exception as e:
+            IO.output_error_messages("That value is not the correct type of data!", e)
+        except Exception as e: ### compare line below with Starter file
             IO.output_error_messages("Error: There was a problem with your entered data.")
 
 # When the program starts, read the file data into a list of lists (table)
@@ -205,6 +205,7 @@ while (True):
 
     # Present the menu of choices
     IO.output_menu(menu=MENU)
+  
     menu_choice = IO.input_menu_choice()
 
     # Input new student
