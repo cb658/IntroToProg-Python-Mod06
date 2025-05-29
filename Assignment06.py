@@ -19,7 +19,7 @@ MENU: str = '''
     4. Exit the program.
 ----------------------------------------- 
 '''
-# Define the Data Constants
+
 FILE_NAME: str = "Enrollments.json"
 
 # Define the Data Variables
@@ -45,14 +45,15 @@ class FileProcessor:
         """ This function reads student data from the Enrollments.json file
         Change Log: (Who, When, What)
         BChristopherson, 5-26-25, Created function
-        :param file_name:
-        :param student_data:
+        :param file_name: string with name of file
+
         :return: student_data
         """
         try:
             file = open(file_name, "r")
             student_data = json.load(file)
             file.close()
+
         except FileNotFoundError as e:
             IO.output_error_messages("Text file must exist before running"
                                      " this script!", e)
@@ -76,6 +77,7 @@ class FileProcessor:
             file = open(file_name, "w")
             json.dump(student_data, file)
             file.close()
+            IO.output_student_courses(student_data=student_data)
         except TypeError as e:
             IO.output_error_messages("Please check if the file is a"
                                      " valid JSON format file", e)
@@ -84,7 +86,7 @@ class FileProcessor:
         finally:
             if file.closed == False:
                 file.closed
-        return student_data
+
 
 ### Separation of Concern Pattern ###
 # PRESENTATION  -----------------------------
@@ -99,7 +101,6 @@ class IO:
     ChangeLog: (Who, When, What)
     BChristopherson, 5-26-2025, Created Class
     """
-    pass
 
     @staticmethod
     def output_error_messages(message: str, error: Exception = None):
@@ -128,7 +129,6 @@ class IO:
         print()
         print(menu)
 
-
     @staticmethod
     def input_menu_choice():
         """ This function accepts the user's menu choice as an input
@@ -154,15 +154,15 @@ class IO:
             BChristopherson, 5-26-25, Created function
             
             :param: student_data, table of student enrollments
-            ### NEED TO FILL THIS IN ###
-            :return: 
+
+            :return: None
             """
-        print("\nThe current registrations are (in comma-separated format): ")
+
         print("-" *50)
-        for student in students:  ###?? - should this be for student in student_data???
-            print(f"{student['FirstName']},{student['LastName']},{student['CourseName']}")
-            #string_row = f"["FirstName"],student[0],student[1],student[2]))
-            #print(student["FirstName"],student["LastName"],student["CourseName"])
+
+        for student in student_data:
+            print(f'Student {student['FirstName']} '
+                  f'{student['LastName']} is enrolled in {student['CourseName']}')
         print("-" *50)
 
 
@@ -172,30 +172,36 @@ class IO:
             Change Log: (Who, When, What)
             BChristopherson, 5-26-25, Created function
 
-            ### NEED TO FILL THIS IN ###
-            :return: student_data
+            :param: student_data, dictionary for each new student
+            :return: student_data list
             """
+
         try: # Input the data
             student_first_name = input("What is the student's first name? ")
-            if not student_first_name.isalpha():
-                raise ValueError("The first name should not contain numbers.")
+            if not student_first_name.isalpha() or student_first_name == "":
+                raise ValueError("The first name cannot contain numbers or cannot be empty.")
             student_last_name = input("What is the student's last name? ")
-            if not student_last_name.isalpha():
-                raise ValueError("The last name should not contain numbers.")
+            if not student_last_name.isalpha() or student_last_name == "":
+                raise ValueError("The last name cannot contain numbers or cannot be empty.")
             course_name = input("What is the course name? ")
             if not course_name:
                 raise ValueError('Response cannot be empty')
+
             student_data = {"FirstName": student_first_name,
                             "LastName": student_last_name,
                             "CourseName": course_name}
+
             # Add new student to the students table
             students.append(student_data)
             print()
             print(f"You have registered {student_first_name} {student_last_name} for {course_name}.")
         except ValueError as e:
-            IO.output_error_messages("That value is not the correct type of data!", e)
-        except Exception as e: ### compare line below with Starter file
+            IO.output_error_messages("-- Technical Error Message -- ", e)
+        except Exception as e:
             IO.output_error_messages("Error: There was a problem with your entered data.")
+        return student_data
+
+# Start of main body
 
 # When the program starts, read the file data into a list of lists (table)
 students = FileProcessor.read_data_from_file(file_name=FILE_NAME, student_data=students)
@@ -205,19 +211,12 @@ while (True):
 
     # Present the menu of choices
     IO.output_menu(menu=MENU)
-  
+
     menu_choice = IO.input_menu_choice()
 
     # Input new student
     if menu_choice == "1":  # This will not work if it is an integer!
         IO.input_student_data(student_data=students)
-        # Process the data to create and display a custom message
-        print()
-        print("-" *50)
-        for student in students:
-            print(f'Student {student["FirstName"]} '
-                  f'{student["LastName"]} is enrolled in:{student["CourseName"]}')
-        print("-" * 50)
         continue
 
     # Display current data
@@ -229,7 +228,6 @@ while (True):
     elif menu_choice == "3":  # This will not work if it is an integer!
         FileProcessor.write_data_to_file(file_name=FILE_NAME, student_data=students)
         print("\nThe data was written to the file!")
-        IO.output_student_courses(student_data=students)
         continue
 
     # Stop the loop
